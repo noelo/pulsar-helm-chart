@@ -18,9 +18,8 @@
     under the License.
 
 -->
-# Official Apache Pulsar Helm Chart
+# Non-Official Apache Pulsar Helm Chart for running Pulsar on OpenShift
 
-This is the officially supported Helm Chart for installing Apache Pulsar on Kubernetes.
 
 Read [Deploying Pulsar on Kubernetes](http://pulsar.apache.org/docs/en/deploy-kubernetes/) for more details.
 
