@@ -47,6 +47,23 @@ subjects:
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "{{ template "pulsar.fullname" . }}-{{ .Values.broker.component }}-scc-rolebinding"
+  labels:
+    {{- include "pulsar.standardLabels" . | nindent 4 }}
+  namespace: {{ template "pulsar.namespace" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:scc:anyuid
+subjects:
+- kind: ServiceAccount
+  name: "{{ template "pulsar.fullname" . }}-{{ .Values.broker.component }}-acct"
+  namespace: {{ template "pulsar.namespace" . }}
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
 {{- if .Values.rbac.limit_to_namespace }}
 kind: Role
 metadata:
