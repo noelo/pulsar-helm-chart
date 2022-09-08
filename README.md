@@ -23,58 +23,34 @@
 
 Read [Deploying Pulsar on Kubernetes](http://pulsar.apache.org/docs/en/deploy-kubernetes/) for more details.
 
-## Features
+## Setup pulsar manager login
 
-This Helm Chart includes all the components of Apache Pulsar for a complete experience.
+```bash 
+CSRF_TOKEN=$(curl http://pulsar-mini-pulsar-manager-pulsar....../pulsar-manager/csrf-token)
 
-- [x] Pulsar core components:
-    - [x] ZooKeeper
-    - [x] Bookies
-    - [x] Brokers
-    - [x] Functions
-    - [x] Proxies
-- [x] Management & monitoring components:
-    - [x] Pulsar Manager
-    - [x] Prometheus
-    - [x] Grafana
 
-It includes support for:
+curl \
+   -H 'X-XSRF-TOKEN: $CSRF_TOKEN' \
+   -H 'Cookie: XSRF-TOKEN=$CSRF_TOKEN;' \
+   -H "Content-Type: application/json" \
+   -X PUT http://pulsar-mini-pulsar-manager-pulsar....../pulsar-manager/users/superuser \
+   -d '{"name": "admin", "password": "apachepulsar", "description": "test", "email": "username@test.org"}'
+```
 
-- [x] Security
-    - [x] Automatically provisioned TLS certs, using [Jetstack](https://www.jetstack.io/)'s [cert-manager](https://cert-manager.io/docs/)
-        - [x] self-signed
-        - [x] [Let's Encrypt](https://letsencrypt.org/)
-    - [x] TLS Encryption
-        - [x] Proxy
-        - [x] Broker
-        - [x] Toolset
-        - [x] Bookie
-        - [x] ZooKeeper
-    - [x] Authentication
-        - [x] JWT
-        - [ ] Mutal TLS
-        - [ ] Kerberos
-    - [x] Authorization
-    - [x] Non-root broker, bookkeeper, proxy, and zookeeper containers (version 2.10.0 and above)
-- [x] Storage
-    - [x] Non-persistence storage
-    - [x] Persistence Volume
-    - [x] Local Persistent Volumes
-    - [ ] Tiered Storage
-- [x] Functions
-    - [x] Kubernetes Runtime
-    - [x] Process Runtime
-    - [x] Thread Runtime
-- [x] Operations
-    - [x] Independent Image Versions for all components, enabling controlled upgrades
+## Expose Pulsar Manager and Proxy
 
-## Requirements
+1. oc expose svc pulsar-pulsar-manager
+1. oc create route passthrough sslproxy-route --service=pulsar-proxy --port=6651
 
-In order to use this chart to deploy Apache Pulsar on Kubernetes, the followings are required.
+## Configure Pulsar Manager - 
 
-1. kubectl 1.18 or higher, compatible with your cluster ([+/- 1 minor release from your cluster](https://kubernetes.io/docs/tasks/tools/install-kubectl/#before-you-begin))
-2. Helm v3 (3.0.2 or higher)
-3. A Kubernetes cluster, version 1.18 or higher.
+service url = http://pulsar-broker:8080
+
+## Get the SSL certificate to connect to the proxy 
+
+```bash
+openssl s_client -showcerts -servername sslproxy-route-pulsar.apps.ocp...... -connect sslproxy-route-pulsar.apps.ocp.....:443
+```
 
 ## Environment setup
 
